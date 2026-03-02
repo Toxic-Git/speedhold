@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speed Hold – Ansøgning</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #0a1628;
+    --blue:   #0e3a6e;
+    --accent: #1a6fd4;
+    --light:  #3b8ef0;
+    --gold:   #c9a227;
+    --bg:     #f2f4f8;
+    --surface:#ffffff;
+    --border: #d0d8e8;
+    --text:   #0a1628;
+    --muted:  #6b7a99;
+    --error:  #c0392b;
+    --success:#1a8a4a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HEADER */
+  header { background: var(--navy); color: white; }
+  .header-inner { max-width: 860px; margin: 0 auto; padding: 36px 32px 24px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px; padding: 4px 12px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    letter-spacing: 0.12em; color: #8aa0be; margin-bottom: 14px; text-transform: uppercase;
+  }
+  .badge::before { content: "▶"; font-size: 8px; color: var(--gold); }
+  header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 5px; }
+  header h1 span { color: var(--gold); }
+  header p { font-size: 13px; color: #7a96b8; font-weight: 300; }
+  .header-meta { display: flex; gap: 24px; margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.07); }
+  .meta-item { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7a96b8; text-transform: uppercase; letter-spacing: 0.07em; }
+  .meta-item strong { color: var(--gold); display: block; font-size: 13px; margin-bottom: 1px; }
+
+  /* PROGRESS */
+  .progress-wrap { background: rgba(0,0,0,0.2); height: 3px; }
+  .progress-bar { height: 3px; background: linear-gradient(90deg, var(--accent), var(--gold)); width: 0%; transition: width 0.35s ease; }
+
+  /* MAIN */
+  main { max-width: 860px; margin: 0 auto; padding: 28px 32px 60px; }
+
+  /* NOTICE */
+  .notice {
+    background: #fffbea; border: 1px solid #e8c93a; border-left: 4px solid var(--gold);
+    border-radius: 6px; padding: 12px 16px; font-size: 13px; color: #6b5600;
+    margin-bottom: 22px; line-height: 1.55;
+  }
+
+  /* SECTION */
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 18px; overflow: hidden; }
+  .section-header {
+    background: var(--blue); color: white; padding: 11px 20px;
+    font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-header .num {
+    background: var(--gold); color: var(--navy); width: 21px; height: 21px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .section-body { padding: 20px; }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .span-2 { grid-column: span 2; }
+
+  /* FIELDS */
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+  .field label .req { color: var(--error); margin-left: 2px; }
+  .field input, .field select, .field textarea {
+    border: 1.5px solid var(--border); border-radius: 5px; padding: 9px 11px;
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; color: var(--text);
+    background: #fafbfd; transition: border-color 0.2s, box-shadow 0.2s; outline: none; width: 100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,109,212,0.1); background: white;
+  }
+  .field textarea { resize: vertical; min-height: 85px; }
+  .field input.error, .field select.error { border-color: var(--error) !important; }
+  .field .hint { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 2px; }
+
+  /* DISCORD FIELD SPECIAL */
+  .discord-wrap { position: relative; }
+  .discord-wrap input { padding-left: 34px; }
+  .discord-at {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #5865F2; font-weight: 600;
+    pointer-events: none;
+  }
+
+  /* MINI CHECKBOXES */
+  .check-mini-grid { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+  .mini-check {
+    display: flex; align-items: center; gap: 9px; cursor: pointer;
+    font-size: 13px; padding: 6px 10px; border-radius: 4px;
+    border: 1.5px solid transparent; transition: all 0.15s; user-select: none;
+  }
+  .mini-check:hover { background: #f0f5ff; border-color: #c0d4f5; }
+  .mini-check input { display: none; }
+  .mini-box {
+    width: 16px; height: 16px; border: 2px solid var(--border); border-radius: 3px;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+  }
+  .mini-check.checked { background: #f0f5ff; border-color: var(--accent); }
+  .mini-check.checked .mini-box { background: var(--accent); border-color: var(--accent); }
+  .mini-check.checked .mini-box::after { content: "✓"; color: white; font-size: 10px; font-weight: 700; }
+
+  /* RADIO */
+  .radio-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+  .radio-item {
+    display: flex; align-items: center; gap: 8px; padding: 9px 14px;
+    border: 1.5px solid var(--border); border-radius: 5px; cursor: pointer;
+    font-size: 13px; font-weight: 600; transition: all 0.2s; background: #fafbfd; user-select: none;
+  }
+  .radio-item input { display: none; }
+  .radio-dot { width: 14px; height: 14px; border: 2px solid var(--border); border-radius: 50%; transition: all 0.15s; }
+  .radio-item.selected { border-color: var(--accent); background: #f0f5ff; color: var(--accent); }
+  .radio-item.selected .radio-dot { background: var(--accent); border-color: var(--accent); }
+
+  /* CERT ROWS */
+  .cert-row { display: grid; grid-template-columns: 2fr 2fr 1.2fr 36px; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .cert-row input { border: 1.5px solid var(--border); border-radius: 5px; padding: 8px 10px; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; background: #fafbfd; outline: none; width: 100%; transition: border-color 0.2s; }
+  .cert-row input:focus { border-color: var(--accent); background: white; }
+  .cert-remove { background: none; border: 1.5px solid #e0e0e0; border-radius: 4px; color: #aaa; cursor: pointer; font-size: 13px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .cert-remove:hover { border-color: var(--error); color: var(--error); background: #fff0f0; }
+
+  /* SUBMIT */
+  .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 26px; }
+  .btn { padding: 12px 28px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; letter-spacing: 0.02em; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover:not(:disabled) { background: var(--light); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,109,212,0.35); }
+  .btn-primary:disabled { background: #aac4e8; cursor: not-allowed; }
+  .btn-secondary { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+  .btn-secondary:hover { color: var(--text); border-color: #aaa; }
+
+  /* SENDING STATE */
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* SUCCESS */
+  #successScreen { display: none; text-align: center; padding: 60px 20px; }
+  #successScreen.show { display: block; }
+  .success-icon { width: 72px; height: 72px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; margin: 0 auto 22px; }
+  #successScreen h2 { font-size: 22px; margin-bottom: 8px; }
+  #successScreen p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+  .ref-num { font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: #f0f5ff; border: 1px solid #c0d4f5; border-radius: 4px; padding: 8px 16px; display: inline-block; margin-top: 14px; color: var(--accent); font-weight: 600; }
+
+  /* ERROR BANNER */
+  .error-banner { background: #fdf0f0; border: 1px solid #f5c6cb; border-left: 4px solid var(--error); border-radius: 6px; padding: 12px 16px; font-size: 13px; color: #721c24; margin-bottom: 16px; display: none; }
+  .error-banner.show { display: block; }
+
+  @media (max-width: 600px) {
+    main { padding: 20px 16px 60px; }
+    .header-inner { padding: 24px 16px 18px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .span-2 { grid-column: span 1; }
+    .cert-row { grid-template-columns: 1fr 36px; }
+    .cert-row .cert-org, .cert-row .cert-date { display: none; }
+    .header-meta { flex-wrap: wrap; gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="badge">Politi · Internt system</div>
+    <h1>Speed Hold <span>/ Eksamensforløb</span></h1>
+    <p>Ansøgningsformular for erfarne betjente – fritagelse fra kursus, direkte til eksamener</p>
+    <div class="header-meta">
+      <div class="meta-item"><strong>~3 dage</strong>Eksamensperiode</div>
+      <div class="meta-item"><strong>Erfarne betjente</strong>Målgruppe</div>
+      <div class="meta-item"><strong>Direkte til Discord</strong>Indsendelse</div>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+</header>
+
+<main>
+  <div id="successScreen">
+    <div class="success-icon">✓</div>
+    <h2>Ansøgning indsendt!</h2>
+    <p>Din ansøgning er sendt direkte til sagsbehandlerne.<br>Du vil blive kontaktet via Discord.</p>
+    <div class="ref-num" id="refNum">REF: SH-2026-XXXX</div>
+    <br><br>
+    <button class="btn btn-secondary" onclick="resetForm()">Indsend ny ansøgning</button>
+  </div>
+
+  <div id="formContent">
+    <div class="notice">
+      ⚠ Speed holdet er udelukkende for <strong>erfarne betjente</strong> med minimum 3 års aktiv tjeneste. Ansøger gennemfører de påtvungne prøver direkte – uden forudgående kursusdeltagelse – over ca. 3 dage.
+    </div>
+
+    <div class="error-banner" id="errorBanner">Der opstod en fejl ved afsendelse. Kontrollér din internetforbindelse og prøv igen.</div>
+
+    <!-- 1. PERSONLIGE OPLYSNINGER -->
+    <div class="section">
+      <div class="section-header"><span class="num">1</span>Personlige oplysninger</div>
+      <div class="section-body">
+        <div class="grid-2">
+          <div class="field"><label>Fornavn <span class="req">*</span></label><input type="text" id="fornavn" placeholder="Fornavn"></div>
+          <div class="field"><label>Efternavn <span class="req">*</span></label><input type="text" id="efternavn" placeholder="Efternavn"></div>
+          <div class="field"><label>Tjenestenummer <span class="req">*</span></label><input type="text" id="tjenestenr" placeholder="T-XXXXX"></div>
+          <div class="field"><label>Tjeneste-e-mail <span class="req">*</span></label><input type="email" id="email" placeholder="navn@politi.dk"></div>
+          <div class="field"><label>Telefonnummer</label><input type="tel" id="telefon" placeholder="xx xx xx xx"></div>
+          <div class="field">
+            <label>Discord ID <span class="req">*</span></label>
+            <div class="discord-wrap">
+              <span class="discord-at">@</span>
+              <input type="text" id="discord" placeholder="brugernavn eller ID-nummer">
+            </div>
+            <span class="hint">Dit Discord-brugernavn eller ID bruges til at kontakte dig direkte</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TJENSTLIG BAGGRUND -->
+    <div class="section">
+      <div class="section-header"><span class="num">2</span>Tjenstlig baggrund</div>
+      <div class="section-body">
+        <div class="grid-2">
+          <div class="field"><label>Politikreds / Ansættelsessted <span class="req">*</span></label>
+            <select id="kreds">
+              <option value="">– Vælg kreds –</option>
+              <option>Københavns Politi</option>
+              <option>Nordsjællands Politi</option>
+              <option>Midt- og Vestsjællands Politi</option>
+              <option>Sydsjællands og Lolland-Falsters Politi</option>
+              <option>Bornholms Politi</option>
+              <option>Fyns Politi</option>
+              <option>Sydøstjyllands Politi</option>
+              <option>Midt- og Vestjyllands Politi</option>
+              <option>Nordjyllands Politi</option>
+              <option>Østjyllands Politi</option>
+              <option>Rigspolitiet</option>
+            </select>
+          </div>
+          <div class="field"><label>Afdeling / Enhed</label><input type="text" id="afdeling" placeholder="F.eks. Efterforskning, Orden..."></div>
+          <div class="field"><label>Rang / Titel <span class="req">*</span></label>
+            <select id="rang">
+              <option value="">– Vælg rang –</option>
+              <option>Politibetjent</option>
+              <option>Politiassistent</option>
+              <option>Politiassistent 1. Grad</option>
+              <option>Politikommissær</option>
+              <option>Vicepolitiinspektør</option>
+              <option>Politiinspektør</option>
+              <option>Chefpolitiinspektør</option>
+              <option>Stabschef</option>
+              <option>Politidirektør</option>
+              <option>Rigspolitichef</option>
+            </select>
+          </div>
+          <div class="field"><label>År i aktiv tjeneste <span class="req">*</span></label>
+            <select id="aarserfaring">
+              <option value="">– Vælg –</option>
+              <option>3–5 år</option>
+              <option>5–10 år</option>
+              <option>10–15 år</option>
+              <option>15–20 år</option>
+              <option>20+ år</option>
+            </select>
+          </div>
+          <div class="field span-2"><label>Begrundelse for ansøgning <span class="req">*</span></label>
+            <textarea id="begrundelse" placeholder="Beskriv din erfaring og kompetencer der gør dig egnet til at gennemføre prøverne direkte uden kursusforløb..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. CERTIFIKATER -->
+    <div class="section">
+      <div class="section-header"><span class="num">3</span>Certifikater &amp; Kvalifikationer</div>
+      <div class="section-body">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Angiv relevante certifikater og uddannelser du har opnået i din tjeneste.</p>
+        <div class="grid-2">
+          <div class="field">
+            <label>Kørekort kategorier</label>
+            <div class="check-mini-grid">
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>B – Personbil</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>BE – Personbil med trailer</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>C – Lastbil</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>D – Bus</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>MC – Motorcykel</label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Politifaglige certifikater</label>
+            <div class="check-mini-grid">
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>Udrykning (§56)</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>Politihund / hundefører</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>Skydevåbenkvalifikation</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>Eftersøgning / SAR</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>Motorcykeludrykningskursus</label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Førstehjælp &amp; Redning</label>
+            <div class="check-mini-grid">
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>Grundlæggende førstehjælp</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>Avanceret førstehjælp</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>AED / hjertestarter</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>Taktisk traumebehandling</label>
+            </div>
+          </div>
+          <div class="field">
+            <label>IT &amp; Efterforskning</label>
+            <div class="check-mini-grid">
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>Digital efterforskning</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>POLSAS / sagsbehandling</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>Videoovervågningsanalyse</label>
+              <label class="mini-check" onclick="toggleMini(this)"><input type="checkbox"><div class="mini-box"></div>Kriminalteknisk grundkursus</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:18px;">
+          <label>Øvrige certifikater / kurser <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:var(--muted);">(tilføj manuelt)</span></label>
+          <div id="certRows">
+            <div class="cert-row">
+              <input type="text" placeholder="Certifikatnavn / kursus" class="cert-name">
+              <input type="text" placeholder="Udstedende organisation" class="cert-org">
+              <input type="date" class="cert-date" title="Udstedelsesdato">
+              <button class="cert-remove" onclick="removeCertRow(this)" title="Fjern">✕</button>
+            </div>
+          </div>
+          <button class="btn btn-secondary" style="margin-top:9px;padding:7px 14px;font-size:13px;" onclick="addCertRow()">+ Tilføj certifikat</button>
+        </div>
+
+        <div class="field" style="margin-top:16px;">
+          <label>Uddybende kommentarer til certifikater</label>
+          <textarea id="cert_kommentar" placeholder="Evt. udløbsdatoer, specialiseringer eller andet relevant..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. ØNSKET PERIODE -->
+    <div class="section">
+      <div class="section-header"><span class="num">4</span>Ønsket periode</div>
+      <div class="section-body">
+        <div class="grid-3">
+          <div class="field"><label>Ønsket startdato <span class="req">*</span></label><input type="date" id="startdato"></div>
+          <div class="field"><label>Alternativ dato</label><input type="date" id="altdato"></div>
+          <div class="field"><label>Særlige hensyn</label><input type="text" id="hensyn" placeholder="F.eks. vagtplan..."></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. LEDERENS GODKENDELSE -->
+    <div class="section">
+      <div class="section-header"><span class="num">5</span>Lederens oplysninger &amp; godkendelse</div>
+      <div class="section-body">
+        <div class="grid-2">
+          <div class="field"><label>Lederens fulde navn <span class="req">*</span></label><input type="text" id="leder_navn" placeholder="Fornavn Efternavn"></div>
+          <div class="field"><label>Titel / Stilling <span class="req">*</span></label><input type="text" id="leder_titel" placeholder="F.eks. Politiinspektør"></div>
+          <div class="field"><label>Lederens e-mail <span class="req">*</span></label><input type="email" id="leder_email" placeholder="leder@politi.dk"></div>
+          <div class="field"><label>Lederens telefon</label><input type="tel" id="leder_telefon" placeholder="xx xx xx xx"></div>
+          <div class="field span-2"><label>Lederens kommentarer / anbefaling</label>
+            <textarea id="leder_kommentar" placeholder="Lederens begrundelse og eventuelle kommentarer..."></textarea>
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <div class="field"><label>Lederens godkendelse <span class="req">*</span></label></div>
+          <div class="radio-group" id="godkendelse">
+            <label class="radio-item" onclick="selectRadio(this,'godkendelse')"><input type="radio" name="godkendelse" value="ja"><div class="radio-dot"></div>Ja – anbefales</label>
+            <label class="radio-item" onclick="selectRadio(this,'godkendelse')"><input type="radio" name="godkendelse" value="nej"><div class="radio-dot"></div>Nej – anbefales ikke</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <span style="font-size:12px;color:var(--muted);">Felter markeret med <span style="color:var(--error);">*</span> er påkrævede</span>
+      <button class="btn btn-primary" id="submitBtn" onclick="submitForm()">Indsend ansøgning →</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  // ⚠️ INDSÆT DIN DISCORD WEBHOOK URL HER:
+  const WEBHOOK_URL = "https://discord.com/api/webhooks/1477822514599170338/J74M1QZaoKNR58Za1TALrPFMTdCSG_XnEoljGlDwXNMkjwGIXFuItooRQ41MfyqxVfWa";
+
+  // ── HELPERS ──────────────────────────────────────────────
+  function toggleMini(el) { el.classList.toggle('checked'); }
+
+  function selectRadio(el, group) {
+    document.querySelectorAll('#' + group + ' .radio-item').forEach(r => r.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function addCertRow() {
+    const div = document.createElement('div');
+    div.className = 'cert-row';
+    div.innerHTML = `<input type="text" placeholder="Certifikatnavn / kursus" class="cert-name"><input type="text" placeholder="Udstedende organisation" class="cert-org"><input type="date" class="cert-date"><button class="cert-remove" onclick="removeCertRow(this)">✕</button>`;
+    document.getElementById('certRows').appendChild(div);
+  }
+
+  function removeCertRow(btn) {
+    if (document.querySelectorAll('.cert-row').length > 1) btn.closest('.cert-row').remove();
+  }
+
+  // Fremskridtslinje
+  const required = ['fornavn','efternavn','tjenestenr','email','discord','kreds','rang','aarserfaring','begrundelse','startdato','leder_navn','leder_titel','leder_email'];
+  document.addEventListener('input', updateProgress);
+  document.addEventListener('change', updateProgress);
+  function updateProgress() {
+    const filled = required.filter(id => { const el = document.getElementById(id); return el && el.value.trim(); }).length;
+    const radio = document.querySelector('#godkendelse .radio-item.selected');
+    document.getElementById('progressBar').style.width = Math.round(((filled + (radio ? 1 : 0)) / (required.length + 1)) * 100) + '%';
+  }
+
+  // ── VALIDERING ────────────────────────────────────────────
+  function validate() {
+    let ok = true;
+    required.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el || !el.value.trim()) { if(el) el.classList.add('error'); ok = false; }
+      else el.classList.remove('error');
+    });
+    if (!document.querySelector('#godkendelse .radio-item.selected')) {
+      alert('Angiv lederens godkendelse.'); ok = false;
+    }
+    return ok;
+  }
+
+  // ── CERTIFIKAT-TEKST ──────────────────────────────────────
+  function getCerts(selector) {
+    return [...document.querySelectorAll(selector + ' .mini-check.checked')]
+      .map(el => el.textContent.trim()).join(', ') || 'Ingen';
+  }
+
+  function getManualCerts() {
+    const rows = document.querySelectorAll('.cert-row');
+    const list = [];
+    rows.forEach(r => {
+      const name = r.querySelector('.cert-name')?.value?.trim();
+      const org  = r.querySelector('.cert-org')?.value?.trim();
+      const date = r.querySelector('.cert-date')?.value;
+      if (name) list.push(name + (org ? ' (' + org + ')' : '') + (date ? ' – ' + date : ''));
+    });
+    return list.length ? list.join('\n') : 'Ingen';
+  }
+
+  // ── INDSEND ───────────────────────────────────────────────
+  async function submitForm() {
+    if (!validate()) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Sender...';
+    document.getElementById('errorBanner').classList.remove('show');
+
+    const ref = 'SH-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+    const godkendt = document.querySelector('#godkendelse .radio-item.selected')?.textContent?.trim() || '–';
+    const godkendtFarve = godkendt.startsWith('Ja') ? 0x1a8a4a : 0xc0392b;
+
+    const discord_id = document.getElementById('discord').value.trim();
+
+    const embed = {
+      title: '🆕 Ny ansøgning – Speed Hold',
+      color: 0x0e3a6e,
+      fields: [
+        { name: '👤 Ansøger',              value: v('fornavn') + ' ' + v('efternavn'),  inline: true  },
+        { name: '🪪 Tjenestenummer',        value: v('tjenestenr'),                      inline: true  },
+        { name: '💬 Discord',              value: '@' + discord_id,                     inline: true  },
+        { name: '📧 E-mail',               value: v('email'),                           inline: true  },
+        { name: '📞 Telefon',              value: v('telefon') || '–',                  inline: true  },
+        { name: '\u200b',                  value: '\u200b',                             inline: true  },
+        { name: '🎖️ Rang',                 value: v('rang'),                            inline: true  },
+        { name: '🏢 Politikreds',           value: v('kreds'),                           inline: true  },
+        { name: '🗂️ Afdeling',             value: v('afdeling') || '–',                 inline: true  },
+        { name: '📅 År i tjeneste',         value: v('aarserfaring'),                    inline: true  },
+        { name: '📆 Ønsket startdato',      value: v('startdato'),                       inline: true  },
+        { name: '📆 Alternativ dato',        value: v('altdato') || '–',                  inline: true  },
+        { name: '📝 Begrundelse',           value: cap(v('begrundelse'), 400),           inline: false },
+        { name: '🚗 Kørekort',             value: getCerts('#formContent .grid-2 > div:nth-child(1) .check-mini-grid'),  inline: true },
+        { name: '🚔 Politifaglige certs',   value: getCerts('#formContent .grid-2 > div:nth-child(2) .check-mini-grid'),  inline: true },
+        { name: '🏥 Førstehjælp',          value: getCerts('#formContent .grid-2 > div:nth-child(3) .check-mini-grid'),  inline: true },
+        { name: '💻 IT & Efterforskning',  value: getCerts('#formContent .grid-2 > div:nth-child(4) .check-mini-grid'),  inline: true },
+        { name: '📜 Øvrige certifikater',  value: getManualCerts(),                     inline: false },
+        { name: '🔖 Særlige hensyn',       value: v('hensyn') || '–',                  inline: false },
+        { name: '─────────────────────',   value: '**Lederens godkendelse**',           inline: false },
+        { name: '👔 Leder',               value: v('leder_navn') + ', ' + v('leder_titel'), inline: true },
+        { name: '📧 Leder e-mail',         value: v('leder_email'),                     inline: true  },
+        { name: '✅ Godkendelse',          value: godkendt,                             inline: true  },
+        { name: '💬 Lederens kommentar',   value: cap(v('leder_kommentar'), 300) || '–',inline: false },
+        { name: '🔖 Reference',            value: '`' + ref + '`',                      inline: true  },
+        { name: '📊 Status',              value: '⏳ Afventer behandling',              inline: true  },
+      ],
+      footer: { text: 'Speed Hold – Politiet · Ansøgning indsendt via formularen' },
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: '📬 **Ny ansøgning modtaget** – kontakt ansøger på Discord: **@' + discord_id + '**',
+          embeds: [embed]
+        })
+      });
+
+      if (res.ok || res.status === 204) {
+        document.getElementById('refNum').textContent = 'REF: ' + ref;
+        document.getElementById('formContent').style.display = 'none';
+        document.getElementById('successScreen').style.display = 'block';
+        document.getElementById('progressBar').style.width = '100%';
+      } else {
+        throw new Error('HTTP ' + res.status);
+      }
+    } catch (err) {
+      document.getElementById('errorBanner').classList.add('show');
+      btn.disabled = false;
+      btn.innerHTML = 'Indsend ansøgning →';
+    }
+  }
+
+  function v(id) {
+    const el = document.getElementById(id);
+    return el ? (el.value.trim() || '–') : '–';
+  }
+  function cap(str, max) {
+    return str && str.length > max ? str.slice(0, max) + '…' : str;
+  }
+
+  function resetForm() {
+    document.querySelectorAll('input, textarea').forEach(el => { if(el.type !== 'checkbox' && el.type !== 'radio') el.value = ''; });
+    document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+    document.querySelectorAll('.mini-check').forEach(el => el.classList.remove('checked'));
+    document.querySelectorAll('.radio-item').forEach(el => el.classList.remove('selected'));
+    document.getElementById('certRows').innerHTML = `<div class="cert-row"><input type="text" placeholder="Certifikatnavn / kursus" class="cert-name"><input type="text" placeholder="Udstedende organisation" class="cert-org"><input type="date" class="cert-date"><button class="cert-remove" onclick="removeCertRow(this)">✕</button></div>`;
+    document.getElementById('formContent').style.display = 'block';
+    document.getElementById('successScreen').style.display = 'none';
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').innerHTML = 'Indsend ansøgning →';
+    document.getElementById('progressBar').style.width = '0%';
+  }
+</script>
+</body>
+</html>
